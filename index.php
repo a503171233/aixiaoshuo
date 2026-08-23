@@ -202,6 +202,7 @@ $user = kl_current_user();
         </div>
       </div>
       <div class="cards" id="promptList"></div>
+      <div class="result hidden" id="promptRunResult"></div>
     </section>
 
     <!-- MCP -->
