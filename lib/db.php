@@ -123,7 +123,7 @@ function kl_now(): string
 /** 按分号切分 SQL 脚本，忽略注释行 */
 function kl_split_sql(string $sql): array
 {
-    $lines = preg_split('/\R/', $sql);
+    $lines = preg_split('/\r\n|\n|\r/', $sql) ?: [];
     $buffer = '';
     $statements = [];
     foreach ($lines as $line) {

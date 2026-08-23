@@ -5,7 +5,10 @@ function kl_json($data, int $code = 200): void
 {
     http_response_code($code);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+    $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+    echo $json === false
+        ? json_encode(['ok' => false, 'message' => '响应数据编码失败：' . json_last_error_msg()], JSON_UNESCAPED_UNICODE)
+        : $json;
     exit;
 }
 
