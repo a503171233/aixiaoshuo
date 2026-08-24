@@ -838,7 +838,7 @@ async function loadModel() {
   if ($('#mInterface')) {
     const validProviders = ['zhipu','official','custom'];
     const prov = validProviders.includes(c.provider) ? c.provider : 'custom';
-    $('#mInterface').value = prov;
+    if ($('#mInterface')) $('#mInterface').value = prov;
 }
 if ($('#mBase')) $('#mBase').value = c.api_base || '';
 if ($('#mKey')) {
