@@ -890,14 +890,18 @@ if (mInterfaceEl) {
   }, '拉取中…'));
 
   $('#saveModel').addEventListener('click', (e) => guard(e.target, async () => {
+    const getVal = (id) => {
+      const el = $(id);
+      return el ? el.value.trim() : '';
+    };
     const res = await api('model_save', {
       provider: (function(){ const el = $('#mInterface'); return el ? el.value.trim() : ''; })(),
-      api_base: $('#mBase').value.trim(),
-      api_key: $('#mKey').value.trim(),
-      model: $('#mModel').value.trim(),
-      temperature: $('#mTemp').value.trim(),
-      max_tokens: $('#mTokens').value.trim(),
-      system_prompt: $('#mSystem').value.trim(),
+      api_base: getVal('#mBase'),
+      api_key: getVal('#mKey'),
+      model: getVal('#mModel'),
+      temperature: getVal('#mTemp'),
+      max_tokens: getVal('#mTokens'),
+      system_prompt: getVal('#mSystem'),
     });
     toast(res.message);
     await loadModel();
