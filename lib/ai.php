@@ -7,7 +7,7 @@ function kl_model_config(int $userId): array
     if (!$row) {
         $row = [
             'user_id' => $userId,
-            'provider' => '自定义 OpenAI 兼容',
+            'provider' => '官方接口',
             'api_base' => '',
             'api_key' => '',
             'model' => '',
