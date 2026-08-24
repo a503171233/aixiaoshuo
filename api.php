@@ -390,12 +390,17 @@ switch ($action) {
             $defaultPlugins = [
                 [
                     'name' => '智谱清言',
+                    'url'  => 'https://open.bigmodel.cn/api/paas/v4',
+                    'type' => 'http',
+                ],
+                [
+                    'name' => '官方接口',
                     'url'  => 'https://ai.anyyds.cn/v1',
                     'type' => 'http',
                 ],
                 [
-                    'name' => '内置插件',
-                    'url'  => 'https://ai.anyyds.cn/v1',
+                    'name' => 'Openapi兼容接口',
+                    'url'  => '',   // 需要用户自行填写后保存
                     'type' => 'http',
                 ],
             ];
