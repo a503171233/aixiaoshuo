@@ -492,6 +492,31 @@ switch ($action) {
         $result['ok'] ? kl_ok(['models' => $result['models']]) : kl_fail($result['message']);
     }
 
+    case 'model_info': {
+        // 公共模型信息接口（无需登录）
+        $cfg  = kl_config();
+        $base = $cfg['model']['api_base'] ?? '';
+        $list = [];
+        // 1. 尝试远程获取模型列表
+        if ($base) {
+            $url  = rtrim($base, '/') . '/models';
+            $resp = @file_get_contents($url);
+            if ($resp !== false) {
+                $data = json_decode($resp, true);
+                if (isset($data['data'])) {
+                    $list = $data['data'];
+                } elseif (isset($data['models'])) {
+                    $list = $data['models'];
+                }
+            }
+        }
+        // 2. 若未获取，则回退本地模型配置
+        if (empty($list)) {
+            $list = array_column(kl_all('SELECT * FROM {model_configs}'), 'model');
+        }
+        kl_ok(['models' => $list]);
+        break;
+    }
     /* ---------------- AI 场景 ---------------- */
     case 'ai_inspiration': {
         $userId = kl_user_id();
