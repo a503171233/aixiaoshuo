@@ -169,6 +169,12 @@ function initNav() {
     try { await api('logout', {}); } catch (e) {}
     location.href = 'login.php';
   });
+  window.addEventListener('hashchange', () => {
+    const name = (location.hash || '').replace('#', '');
+    if (VIEW_META[name] && !$(`.view[data-view="${name}"]`).classList.contains('active')) {
+      switchView(name);
+    }
+  });
 }
 
 /* ---------------- 书架 ---------------- */

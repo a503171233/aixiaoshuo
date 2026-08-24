@@ -162,7 +162,7 @@ function kl_ai_stream(int $userId, string $prompt, callable $onChunk, array $opt
         ], JSON_UNESCAPED_UNICODE),
         CURLOPT_TIMEOUT => (int)($options['timeout'] ?? 120),
         CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use ($onChunk) {
-            foreach (preg_split('/\R/', (string)$chunk) as $line) {
+            foreach (preg_split('/\r\n|\n|\r/', (string)$chunk) ?: [] as $line) {
                 if (!str_starts_with($line, 'data: ')) {
                     continue;
                 }
