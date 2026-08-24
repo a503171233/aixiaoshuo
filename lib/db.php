@@ -30,14 +30,32 @@ function kl_connect(array $cfg): PDO
     return $pdo;
 }
 
+// 支持运行时动态切换数据库配置
+function kl_set_runtime_db(array $cfg): void
+{
+    // 将运行时数据库配置保存到静态变量，供后续 kl_db 使用
+    static $runtime_cfg = null;
+    $runtime_cfg = $cfg;
+    // 重新建立连接，覆盖已有 PDO 实例
+    $GLOBALS['__kl_runtime_db_cfg'] = $cfg;
+    // 清除已缓存的 PDO 实例，以便下次重新连接
+    $GLOBALS['__kl_pdo_instance'] = null;
+}
+
 function kl_db(): PDO
 {
-    static $pdo = null;
-    if ($pdo === null) {
-        $cfg = kl_config();
-        $pdo = kl_connect($cfg['db']);
+    // 使用全局缓存的 PDO 实例，实现单例
+    if (isset($GLOBALS['__kl_pdo_instance']) && $GLOBALS['__kl_pdo_instance'] instanceof PDO) {
+        return $GLOBALS['__kl_pdo_instance'];
     }
-    return $pdo;
+    // 优先使用运行时配置，否则使用配置文件中的 db 配置
+    $cfg = $GLOBALS['__kl_runtime_db_cfg'] ?? null;
+    if ($cfg === null) {
+        $cfg = kl_config();
+        $cfg = $cfg['db'];
+    }
+    $GLOBALS['__kl_pdo_instance'] = kl_connect($cfg);
+    return $GLOBALS['__kl_pdo_instance'];
 }
 
 function kl_prefix(): string

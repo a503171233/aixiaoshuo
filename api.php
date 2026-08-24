@@ -547,6 +547,27 @@ switch ($action) {
         kl_ok(['models' => $list]);
         break;
     }
+    // 动态切换数据库配置
+    case 'db_switch': {
+        // 期待的字段：driver, host, port, database, username, password, charset, prefix（可选）
+        $cfg = [
+            'driver'   => $in['driver'] ?? 'sqlite',
+            'host'     => $in['host'] ?? '',
+            'port'     => $in['port'] ?? 0,
+            'database' => $in['database'] ?? '',
+            'username' => $in['username'] ?? '',
+            'password' => $in['password'] ?? '',
+            'charset'  => $in['charset'] ?? 'utf8mb4',
+            'prefix'   => $in['prefix'] ?? 'kl_',
+        ];
+        if (!in_array($cfg['driver'], ['sqlite', 'mysql'])) {
+            kl_fail('不支持的数据库驱动');
+        }
+        // 设置运行时数据库配置
+        kl_set_runtime_db($cfg);
+        kl_ok(['message' => '已切换数据库配置']);
+        break;
+    }
     /* ---------------- AI 场景 ---------------- */
     case 'ai_inspiration': {
         $userId = kl_user_id();
