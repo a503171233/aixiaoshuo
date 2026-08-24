@@ -10,6 +10,8 @@ const VIEW_META = {
   setting: ['设置', '外观偏好与 OpenAI 兼容模型配置。'],
   mine: ['我的', '积分、等级、邀请奖励与账户安全。'],
 };
+const modelSelect = document.querySelector('#modelSelect');
+const providerSelect = document.querySelector('#providerSelect');
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -833,27 +835,56 @@ loaders.mcp = loadMcps;
 async function loadModel() {
   const res = await api('model_get');
   const c = res.config || {};
-  $('#mProvider').value = c.provider || '自定义 OpenAI 兼容';
-  $('#mBase').value = c.api_base || '';
-  $('#mKey').value = c.api_key || '';
-  $('#mModel').value = c.model || '';
-  $('#mTemp').value = c.temperature != null ? c.temperature : '0.7';
-  $('#mTokens').value = c.max_tokens != null ? c.max_tokens : '129000';
-  $('#mSystem').value = c.system_prompt || '';
-  $('#mKey').placeholder = c.has_key ? '已保存密钥，留空或不修改即保持原值' : 'sk-...';
+  if ($('#mInterface')) $('#mInterface').value = c.provider || 'custom';
+  if ($('#mBase')) $('#mBase').value = c.api_base || '';
+if ($('#mKey')) $('#mKey').value = c.api_key || '';
+if ($('#mModel')) $('#mModel').value = c.model || '';
+if ($('#mTemp')) $('#mTemp').value = c.temperature != null ? c.temperature : '0.7';
+if ($('#mTokens')) $('#mTokens').value = c.max_tokens != null ? c.max_tokens : '129000';
+if ($('#mSystem')) $('#mSystem').value = c.system_prompt || '';
+if ($('#mKey')) $('#mKey').placeholder = c.has_key ? '已保存密钥，留空或不修改即保持原值' : 'sk-...';
 }
 
 function initSetting() {
+  // 切换接口类型时更新表单显示和只读属性
+  const mInterfaceEl = $('#mInterface');
+if (mInterfaceEl) {
+  mInterfaceEl.addEventListener('change', () => {
+    const type = mInterfaceEl.value;
+    const rowBaseEl = $('#rowBase');
+    const mBaseEl = $('#mBase');
+    const mKeyEl = $('#mKey');
+    const mModelEl = $('#mModel');
+    if (type === 'zhipu') {
+      if (rowBaseEl) rowBaseEl.classList.add('hidden');
+      if (mBaseEl) mBaseEl.value = 'https://open.bigmodel.cn/api/paas/v4';
+      if (mKeyEl) mKeyEl.removeAttribute('readonly');
+      if (mModelEl) mModelEl.removeAttribute('readonly');
+    } else if (type === 'official') {
+      if (rowBaseEl) rowBaseEl.classList.add('hidden');
+      if (mBaseEl) mBaseEl.value = 'https://ai.anyyds.cn/v1';
+      if (mKeyEl) { mKeyEl.value = '**************...'; mKeyEl.setAttribute('readonly', true); }
+      if (mModelEl) { mModelEl.value = 'GLM-4.5-Flash'; mModelEl.setAttribute('readonly', true); }
+    } else {
+      if (rowBaseEl) rowBaseEl.classList.remove('hidden');
+      if (mBaseEl) mBaseEl.value = '';
+      if (mKeyEl) { mKeyEl.value = ''; mKeyEl.removeAttribute('readonly'); }
+      if (mModelEl) { mModelEl.value = ''; mModelEl.removeAttribute('readonly'); }
+    }
+  });
+}
+
   $('#fetchModels').addEventListener('click', (e) => guard(e.target, async () => {
-    const res = await api('model_list');
+    const res = await api('model_info');
     const models = res.models || [];
     if (!models.length) throw new Error('接口未返回模型列表，可手动输入模型名称');
     $('#modelOptions').innerHTML = models.map((m) => `<option value="${esc(m)}"></option>`).join('');
     toast('已拉取 ' + models.length + ' 个模型，点击输入框查看');
   }, '拉取中…'));
+
   $('#saveModel').addEventListener('click', (e) => guard(e.target, async () => {
     const res = await api('model_save', {
-      provider: $('#mProvider').value.trim(),
+      provider: (function(){ const el = $('#mInterface'); return el ? el.value.trim() : ''; })(),
       api_base: $('#mBase').value.trim(),
       api_key: $('#mKey').value.trim(),
       model: $('#mModel').value.trim(),
@@ -949,6 +980,8 @@ function init() {
   initMcp();
   initSetting();
   initMine();
+  // 确保在加载模型配置时触发接口类型的默认状态
+  if ($('#mInterface')) $('#mInterface').dispatchEvent(new Event('change'));
   renderChips();
   const hash = (location.hash || '').replace('#', '');
   switchView(VIEW_META[hash] ? hash : 'shelf');
