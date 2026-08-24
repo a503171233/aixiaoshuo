@@ -22,7 +22,7 @@
     submit.disabled = true;
     submit.textContent = mode === 'register' ? '注册中…' : '登录中…';
     try {
-      const res = await fetch('api.php?action=' + mode, {
+      const res = await fetch('/api.php?action=' + mode, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
