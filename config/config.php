@@ -9,7 +9,7 @@ return array (
   'db' => 
   array (
     'driver' => 'sqlite',
-    'database' => '/workspace/data/klrvai_novel.sqlite',
+    'database' => '/tmp/klrvai_novel.sqlite',
     'prefix' => 'kl_',
   ),
 );
