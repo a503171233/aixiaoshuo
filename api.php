@@ -11,7 +11,7 @@ kl_start_session();
 $action = (string)($_GET['action'] ?? '');
 $in = kl_input();
 
-$publicActions = ['login', 'register', 'session'];
+$publicActions = ['login', 'register', 'session', 'db_switch'];
 if (!in_array($action, $publicActions, true)) {
     kl_require_login();
 }
