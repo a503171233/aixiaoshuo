@@ -150,7 +150,4 @@ function kl_normalize_provider(string $provider): string {
     return $map[$provider] ?? $provider;
 }
 
-function kl_prefix(): string
-{
-    return kl_config()['db']['prefix'] ?? 'kl_';
-}
+
