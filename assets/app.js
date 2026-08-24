@@ -835,7 +835,7 @@ loaders.mcp = loadMcps;
 async function loadModel() {
   const res = await api('model_get');
   const c = res.config || {};
-  $('#mProvider').value = c.provider || '自定义 OpenAI 兼容';
+  $('#mInterface').value = c.provider || 'custom';
   $('#mBase').value = c.api_base || '';
   $('#mKey').value = c.api_key || '';
   $('#mModel').value = c.model || '';
@@ -846,16 +846,42 @@ async function loadModel() {
 }
 
 function initSetting() {
+  // 切换接口类型时更新表单显示和只读属性
+  $('#mInterface').addEventListener('change', () => {
+    const type = $('#mInterface').value;
+    if (type === 'zhipu') {
+      $('#rowBase').classList.add('hidden');
+      $('#mBase').value = 'https://open.bigmodel.cn/api/paas/v4';
+      $('#mKey').removeAttribute('readonly');
+      $('#mModel').removeAttribute('readonly');
+    } else if (type === 'official') {
+      $('#rowBase').classList.add('hidden');
+      $('#mBase').value = 'https://ai.anyyds.cn/v1';
+      $('#mKey').value = '**************...';
+      $('#mKey').setAttribute('readonly', true);
+      $('#mModel').value = 'GLM-4.5-Flash';
+      $('#mModel').setAttribute('readonly', true);
+    } else {
+      $('#rowBase').classList.remove('hidden');
+      $('#mBase').value = '';
+      $('#mKey').value = '';
+      $('#mKey').removeAttribute('readonly');
+      $('#mModel').value = '';
+      $('#mModel').removeAttribute('readonly');
+    }
+  });
+
   $('#fetchModels').addEventListener('click', (e) => guard(e.target, async () => {
-    const res = await api('model_list');
+    const res = await api('model_info');
     const models = res.models || [];
     if (!models.length) throw new Error('接口未返回模型列表，可手动输入模型名称');
     $('#modelOptions').innerHTML = models.map((m) => `<option value="${esc(m)}"></option>`).join('');
     toast('已拉取 ' + models.length + ' 个模型，点击输入框查看');
   }, '拉取中…'));
+
   $('#saveModel').addEventListener('click', (e) => guard(e.target, async () => {
     const res = await api('model_save', {
-      provider: $('#mProvider').value.trim(),
+      provider: $('#mInterface').value.trim(),
       api_base: $('#mBase').value.trim(),
       api_key: $('#mKey').value.trim(),
       model: $('#mModel').value.trim(),
@@ -951,6 +977,8 @@ function init() {
   initMcp();
   initSetting();
   initMine();
+  // 确保在加载模型配置时触发接口类型的默认状态
+  $('#mInterface').dispatchEvent(new Event('change'));
   renderChips();
   const hash = (location.hash || '').replace('#', '');
   switchView(VIEW_META[hash] ? hash : 'shelf');
