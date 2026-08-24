@@ -484,6 +484,7 @@ switch ($action) {
     /* ---------------- 模型配置 ---------------- */
     case 'model_get': {
         $cfg = kl_model_config(kl_user_id());
+$cfg['provider'] = kl_normalize_provider((string)$cfg['provider']);
         $cfg['api_key'] = kl_mask_key((string)$cfg['api_key']);
         $cfg['has_key'] = $cfg['api_key'] !== '';
         kl_ok(['config' => $cfg]);
@@ -501,11 +502,18 @@ switch ($action) {
             kl_fail('温度参数范围为 0 到 2');
         }
         $rawKey = (string)($in['api_key'] ?? '');
+        // provider 校验
+        $allowedProviders = ['zhipu','official','custom'];
+        $providerRaw = trim((string)($in['provider'] ?? 'custom'));
+        $providerNorm = kl_normalize_provider($providerRaw);
+        if (!in_array($providerNorm, $allowedProviders, true)) {
+            kl_fail('不支持的接口类型');
+        }
         $apiKey = (str_contains($rawKey, '*') || $rawKey === '')
             ? (string)$current['api_key']
             : kl_encrypt(trim($rawKey));
         kl_update('model_configs', [
-            'provider' => mb_substr(trim((string)($in['provider'] ?? '自定义 OpenAI 兼容')), 0, 40) ?: '自定义 OpenAI 兼容',
+            'provider' => kl_normalize_provider(mb_substr(trim((string)($in['provider'] ?? 'custom')), 0, 40) ?: 'custom'),
             'api_base' => $apiBase,
             'api_key' => $apiKey,
             'model' => mb_substr(trim((string)($in['model'] ?? '')), 0, 80),

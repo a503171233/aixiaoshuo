@@ -139,3 +139,18 @@ function kl_random_code(int $len = 8): string
 {
     return strtoupper(substr(bin2hex(random_bytes($len)), 0, $len));
 }
+
+// 新增函数：统一 provider 标识
+function kl_normalize_provider(string $provider): string {
+    $map = [
+        '智谱清言' => 'zhipu',
+        '官方接口' => 'official',
+        '自定义 OpenAI 兼容' => 'custom',
+    ];
+    return $map[$provider] ?? $provider;
+}
+
+function kl_prefix(): string
+{
+    return kl_config()['db']['prefix'] ?? 'kl_';
+}

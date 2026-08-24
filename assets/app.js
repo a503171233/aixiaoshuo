@@ -835,9 +835,16 @@ loaders.mcp = loadMcps;
 async function loadModel() {
   const res = await api('model_get');
   const c = res.config || {};
-  if ($('#mInterface')) $('#mInterface').value = c.provider || 'custom';
-  if ($('#mBase')) $('#mBase').value = c.api_base || '';
-if ($('#mKey')) $('#mKey').value = c.api_key || '';
+  if ($('#mInterface')) {
+    const validProviders = ['zhipu','official','custom'];
+    const prov = validProviders.includes(c.provider) ? c.provider : 'custom';
+    $('#mInterface').value = prov;
+}
+if ($('#mBase')) $('#mBase').value = c.api_base || '';
+if ($('#mKey')) {
+    // 已在后端对 key 做掩码，直接填入即可（占位字符已在 placeholder 中处理）
+    $('#mKey').value = c.api_key || '';
+}
 if ($('#mModel')) $('#mModel').value = c.model || '';
 if ($('#mTemp')) $('#mTemp').value = c.temperature != null ? c.temperature : '0.7';
 if ($('#mTokens')) $('#mTokens').value = c.max_tokens != null ? c.max_tokens : '129000';
