@@ -835,41 +835,44 @@ loaders.mcp = loadMcps;
 async function loadModel() {
   const res = await api('model_get');
   const c = res.config || {};
-  $('#mInterface').value = c.provider || 'custom';
-  $('#mBase').value = c.api_base || '';
-  $('#mKey').value = c.api_key || '';
-  $('#mModel').value = c.model || '';
-  $('#mTemp').value = c.temperature != null ? c.temperature : '0.7';
-  $('#mTokens').value = c.max_tokens != null ? c.max_tokens : '129000';
-  $('#mSystem').value = c.system_prompt || '';
-  $('#mKey').placeholder = c.has_key ? '已保存密钥，留空或不修改即保持原值' : 'sk-...';
+  if ($('#mInterface')) $('#mInterface').value = c.provider || 'custom';
+  if ($('#mBase')) $('#mBase').value = c.api_base || '';
+if ($('#mKey')) $('#mKey').value = c.api_key || '';
+if ($('#mModel')) $('#mModel').value = c.model || '';
+if ($('#mTemp')) $('#mTemp').value = c.temperature != null ? c.temperature : '0.7';
+if ($('#mTokens')) $('#mTokens').value = c.max_tokens != null ? c.max_tokens : '129000';
+if ($('#mSystem')) $('#mSystem').value = c.system_prompt || '';
+if ($('#mKey')) $('#mKey').placeholder = c.has_key ? '已保存密钥，留空或不修改即保持原值' : 'sk-...';
 }
 
 function initSetting() {
   // 切换接口类型时更新表单显示和只读属性
-  $('#mInterface').addEventListener('change', () => {
-    const type = $('#mInterface').value;
+  const mInterfaceEl = $('#mInterface');
+if (mInterfaceEl) {
+  mInterfaceEl.addEventListener('change', () => {
+    const type = mInterfaceEl.value;
+    const rowBaseEl = $('#rowBase');
+    const mBaseEl = $('#mBase');
+    const mKeyEl = $('#mKey');
+    const mModelEl = $('#mModel');
     if (type === 'zhipu') {
-      $('#rowBase').classList.add('hidden');
-      $('#mBase').value = 'https://open.bigmodel.cn/api/paas/v4';
-      $('#mKey').removeAttribute('readonly');
-      $('#mModel').removeAttribute('readonly');
+      if (rowBaseEl) rowBaseEl.classList.add('hidden');
+      if (mBaseEl) mBaseEl.value = 'https://open.bigmodel.cn/api/paas/v4';
+      if (mKeyEl) mKeyEl.removeAttribute('readonly');
+      if (mModelEl) mModelEl.removeAttribute('readonly');
     } else if (type === 'official') {
-      $('#rowBase').classList.add('hidden');
-      $('#mBase').value = 'https://ai.anyyds.cn/v1';
-      $('#mKey').value = '**************...';
-      $('#mKey').setAttribute('readonly', true);
-      $('#mModel').value = 'GLM-4.5-Flash';
-      $('#mModel').setAttribute('readonly', true);
+      if (rowBaseEl) rowBaseEl.classList.add('hidden');
+      if (mBaseEl) mBaseEl.value = 'https://ai.anyyds.cn/v1';
+      if (mKeyEl) { mKeyEl.value = '**************...'; mKeyEl.setAttribute('readonly', true); }
+      if (mModelEl) { mModelEl.value = 'GLM-4.5-Flash'; mModelEl.setAttribute('readonly', true); }
     } else {
-      $('#rowBase').classList.remove('hidden');
-      $('#mBase').value = '';
-      $('#mKey').value = '';
-      $('#mKey').removeAttribute('readonly');
-      $('#mModel').value = '';
-      $('#mModel').removeAttribute('readonly');
+      if (rowBaseEl) rowBaseEl.classList.remove('hidden');
+      if (mBaseEl) mBaseEl.value = '';
+      if (mKeyEl) { mKeyEl.value = ''; mKeyEl.removeAttribute('readonly'); }
+      if (mModelEl) { mModelEl.value = ''; mModelEl.removeAttribute('readonly'); }
     }
   });
+}
 
   $('#fetchModels').addEventListener('click', (e) => guard(e.target, async () => {
     const res = await api('model_info');
@@ -881,7 +884,7 @@ function initSetting() {
 
   $('#saveModel').addEventListener('click', (e) => guard(e.target, async () => {
     const res = await api('model_save', {
-      provider: $('#mInterface').value.trim(),
+      provider: (function(){ const el = $('#mInterface'); return el ? el.value.trim() : ''; })(),
       api_base: $('#mBase').value.trim(),
       api_key: $('#mKey').value.trim(),
       model: $('#mModel').value.trim(),
@@ -978,7 +981,7 @@ function init() {
   initSetting();
   initMine();
   // 确保在加载模型配置时触发接口类型的默认状态
-  $('#mInterface').dispatchEvent(new Event('change'));
+  if ($('#mInterface')) $('#mInterface').dispatchEvent(new Event('change'));
   renderChips();
   const hash = (location.hash || '').replace('#', '');
   switchView(VIEW_META[hash] ? hash : 'shelf');
