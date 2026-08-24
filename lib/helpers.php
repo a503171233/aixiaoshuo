@@ -146,6 +146,7 @@ function kl_normalize_provider(string $provider): string {
         '智谱清言' => 'zhipu',
         '官方接口' => 'official',
         '自定义 OpenAI 兼容' => 'custom',
+        'Deep Seek' => 'deepseek',
     ];
     return $map[$provider] ?? $provider;
 }

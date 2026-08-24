@@ -230,9 +230,10 @@ $user = kl_current_user();
         <div class="field-row">
           <label class="field"><span>接口类型</span>
     <select id="mInterface">
-        <option value="zhipu">智谱清言</option>
         <option value="official">官方接口</option>
         <option value="custom">Openapi兼容接口</option>
+        <option value="zhipu">智谱清言</option>
+        <option value="deepseek">Deep Seek</option>
     </select>
 </label>
           <label class="field" id="rowBase"><span>API 地址</span><input type="text" id="mBase" placeholder="https://api.example.com/v1"></label>

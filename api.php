@@ -503,7 +503,7 @@ $cfg['provider'] = kl_normalize_provider((string)$cfg['provider']);
         }
         $rawKey = (string)($in['api_key'] ?? '');
         // provider 校验
-        $allowedProviders = ['zhipu','official','custom'];
+        $allowedProviders = ['zhipu','official','custom','deepseek'];
         $providerRaw = trim((string)($in['provider'] ?? 'custom'));
         $providerNorm = kl_normalize_provider($providerRaw);
         if (!in_array($providerNorm, $allowedProviders, true)) {

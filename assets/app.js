@@ -872,6 +872,11 @@ if (mInterfaceEl) {
       if (mBaseEl) mBaseEl.value = 'https://ai.anyyds.cn/v1';
       if (mKeyEl) { mKeyEl.value = '**************...'; mKeyEl.setAttribute('readonly', true); }
       if (mModelEl) { mModelEl.value = 'GLM-4.5-Flash'; mModelEl.setAttribute('readonly', true); }
+    } else if (type === 'deepseek') {
+      if (rowBaseEl) rowBaseEl.classList.add('hidden');
+      if (mBaseEl) mBaseEl.value = 'https://api.deepseek.com/v1';
+      if (mKeyEl) { mKeyEl.value = ''; mKeyEl.removeAttribute('readonly'); }
+      if (mModelEl) { mModelEl.value = ''; mModelEl.removeAttribute('readonly'); }
     } else {
       if (rowBaseEl) rowBaseEl.classList.remove('hidden');
       if (mBaseEl) mBaseEl.value = '';
