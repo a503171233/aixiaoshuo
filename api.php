@@ -531,28 +531,15 @@ $cfg['provider'] = kl_normalize_provider((string)$cfg['provider']);
     }
 
     case 'model_info': {
-        // 公共模型信息接口（无需登录）
-        $cfg  = kl_config();
-        $base = $cfg['model']['api_base'] ?? '';
-        $list = [];
-        // 1. 尝试远程获取模型列表
-        if ($base) {
-            $url  = rtrim($base, '/') . '/models';
-            $resp = @file_get_contents($url);
-            if ($resp !== false) {
-                $data = json_decode($resp, true);
-                if (isset($data['data'])) {
-                    $list = $data['data'];
-                } elseif (isset($data['models'])) {
-                    $list = $data['models'];
-                }
-            }
+        // 公共模型信息接口（无需登录），返回可用模型列表
+        $userId = kl_user_id() ?: 0; // 使用当前登录用户 ID，如果未登录则使用 0
+        $result = kl_ai_models($userId);
+        if ($result['ok']) {
+            kl_ok(['models' => $result['models']]);
+        } else {
+            // 若后端不支持 /models，回退为空列表，让前端提示手动输入
+            kl_ok(['models' => []]);
         }
-        // 2. 若未获取，则回退本地模型配置
-        if (empty($list)) {
-            $list = array_column(kl_all('SELECT * FROM {model_configs}'), 'model');
-        }
-        kl_ok(['models' => $list]);
         break;
     }
     // 动态切换数据库配置

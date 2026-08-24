@@ -887,7 +887,7 @@ if (mInterfaceEl) {
 }
 
   $('#fetchModels').addEventListener('click', (e) => guard(e.target, async () => {
-    const res = await api('model_list');
+    const res = await api('model_info');
     const models = res.models || [];
     if (!models.length) throw new Error('接口未返回模型列表，可手动输入模型名称');
     $('#modelOptions').innerHTML = models.map((m) => `<option value="${esc(m)}"></option>`).join('');
