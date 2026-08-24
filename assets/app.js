@@ -10,6 +10,8 @@ const VIEW_META = {
   setting: ['设置', '外观偏好与 OpenAI 兼容模型配置。'],
   mine: ['我的', '积分、等级、邀请奖励与账户安全。'],
 };
+const modelSelect = document.querySelector('#modelSelect');
+const providerSelect = document.querySelector('#providerSelect');
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));

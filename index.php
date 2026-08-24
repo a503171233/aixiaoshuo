@@ -228,7 +228,7 @@ $user = kl_current_user();
         <h2>模型配置（OpenAI 兼容）</h2>
         <p class="lead">所有 AI 调用均走此配置，密钥加密存储、页面以星号展示。</p>
         <div class="field-row">
-          <label class="field"><span>服务商</span><input type="text" id="mProvider" placeholder="自定义 OpenAI 兼容"></label>
+          <label class="field"><span>服务商</span><select id="mProvider"><option value="anyyds">anyyds</option><option value="openai">openai</option><option value="custom">自定义 OpenAI 兼容</option></select></label>
           <label class="field"><span>API 地址</span><input type="text" id="mBase" placeholder="https://api.deepseek.com/v1"></label>
         </div>
         <div class="field-row">
