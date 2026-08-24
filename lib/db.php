@@ -91,7 +91,7 @@ function kl_insert(string $table, array $data): int
     $sql = sprintf(
         'INSERT INTO %s (%s) VALUES (%s)',
         kl_table($table),
-        implode(',', array_map(static fn($c) => '"' . $c . '"', $cols)),
+        implode(',', array_map(static fn($c) => "`$c`", $cols)),
         implode(',', array_fill(0, count($cols), '?'))
     );
     $stmt = kl_db()->prepare($sql);
@@ -101,7 +101,7 @@ function kl_insert(string $table, array $data): int
 
 function kl_update(string $table, array $data, string $where, array $whereParams = []): int
 {
-    $sets = implode(',', array_map(static fn($c) => '"' . $c . '"=?', array_keys($data)));
+    $sets = implode(',', array_map(static fn($c) => '`' . $c . '`=?', array_keys($data)));
     $sql = sprintf('UPDATE %s SET %s WHERE %s', kl_table($table), $sets, $where);
     $stmt = kl_db()->prepare($sql);
     $stmt->execute(array_merge(array_values($data), $whereParams));
