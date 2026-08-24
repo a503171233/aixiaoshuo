@@ -379,10 +379,35 @@ switch ($action) {
 
     case 'mcp_save': {
         $userId = kl_user_id();
-        $id = (int)($in['id'] ?? 0);
+        // 自动插入默认插件（首次打开且未提交任何插件信息时）
+        $id   = (int)($in['id'] ?? 0);
         $name = trim((string)($in['name'] ?? ''));
-        $url = trim((string)($in['url'] ?? ''));
+        $url  = trim((string)($in['url'] ?? ''));
         $type = in_array($in['type'] ?? '', ['http', 'streamable_http', 'sse'], true) ? $in['type'] : 'http';
+
+        // 当请求体为空且是新建操作时，创建两条默认插件
+        if ($id === 0 && $name === '' && $url === '' && $type === 'http') {
+            $defaultPlugins = [
+                [
+                    'name' => '智谱清言',
+                    'url'  => 'https://ai.anyyds.cn/v1',
+                    'type' => 'http',
+                ],
+                [
+                    'name' => '内置插件',
+                    'url'  => 'https://ai.anyyds.cn/v1',
+                    'type' => 'http',
+                ],
+            ];
+            foreach ($defaultPlugins as $def) {
+                $def['user_id']    = $userId;
+                $def['created_at'] = kl_now();
+                $pid = kl_insert('mcp_plugins', $def);
+                kl_insert('mcp_stats', ['plugin_id' => $pid, 'created_at' => kl_now()]);
+            }
+            kl_ok(['message' => '已自动创建默认插件（智谱清言 & 内置插件）']);
+            break;
+        }
         if ($name === '') {
             kl_fail('请填写插件名称');
         }
