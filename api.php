@@ -11,7 +11,7 @@ kl_start_session();
 $action = (string)($_GET['action'] ?? '');
 $in = kl_input();
 
-$publicActions = ['login', 'register', 'session', 'db_switch'];
+$publicActions = ['login', 'register', 'session', 'db_switch', 'model_info'];
 if (!in_array($action, $publicActions, true)) {
     kl_require_login();
 }
@@ -533,12 +533,26 @@ $cfg['provider'] = kl_normalize_provider((string)$cfg['provider']);
     case 'model_info': {
         // 公共模型信息接口（无需登录），返回可用模型列表
         $userId = kl_user_id() ?: 0; // 使用当前登录用户 ID，如果未登录则使用 0
-        $result = kl_ai_models($userId);
-        if ($result['ok']) {
-            kl_ok(['models' => $result['models']]);
+        $cfg = null;
+        try {
+            $cfg = kl_model_config($userId);
+        } catch (Throwable $e) {
+            // 数据库不可用时直接返回空或默认模型
+        }
+        $providerNorm = $cfg ? kl_normalize_provider((string)($cfg['provider'] ?? '')) : 'official';
+        if ($providerNorm === 'official') {
+            // 官方内置接口返回默认模型名称
+            $model = $cfg ? trim((string)($cfg['model'] ?? '')) : 'GLM-4.5-Flash';
+            $list = $model !== '' ? [$model] : [];
+            kl_ok(['models' => $list]);
         } else {
-            // 若后端不支持 /models，回退为空列表，让前端提示手动输入
-            kl_ok(['models' => []]);
+            $result = kl_ai_models($userId);
+            if ($result['ok']) {
+                kl_ok(['models' => $result['models']]);
+            } else {
+                // 若后端不支持 /models，回退为空列表，让前端提示手动输入
+                kl_ok(['models' => []]);
+            }
         }
         break;
     }
